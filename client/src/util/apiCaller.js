@@ -10,11 +10,12 @@ export default async (endpoint, method = 'get', body) => {
   })
   .then(response => response.json().then(json => ({ json, response })))
   .then(({ json, response }) => {
+    const data = Object.assign(json, { status: response.status });
     if (!response.ok) {
-      return Promise.reject(json);
+      return Promise.reject(data);
     }
 
-    return json;
+    return data;
   })
   .then(
     response => response,

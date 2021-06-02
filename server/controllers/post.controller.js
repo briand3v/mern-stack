@@ -12,7 +12,7 @@ const sanitizeHtml = require('sanitize-html');
 getPosts = async (req, res) => {
   Post.find().sort('-dateAdded').exec((err, posts) => {
     if (err) {
-      res.status(500).send(err);
+      return res.status(500).send(err);
     }
     res.json({ posts });
   });
@@ -40,9 +40,9 @@ addPost = async (req, res) => {
   newPost.cuid = cuid();
   newPost.save((err, saved) => {
     if (err) {
-      res.status(500).send(err);
+      return res.status(500).send(err);
     }
-    res.json({ post: saved });
+    return res.json({ post: saved });
   });
 };
 
@@ -55,9 +55,9 @@ addPost = async (req, res) => {
 getPost = async (req, res) => {
   Post.findOne({ cuid: req.params.cuid }).exec((err, post) => {
     if (err) {
-      res.status(500).send(err);
+      return res.status(500).send(err);
     }
-    res.json({ post });
+    return res.json({ post });
   });
 };
 
@@ -70,11 +70,11 @@ getPost = async (req, res) => {
 deletePost = async (req, res) => {
   Post.findOne({ cuid: req.params.cuid }).exec((err, post) => {
     if (err) {
-      res.status(500).send(err);
+      return res.status(500).send(err);
     }
 
     post.remove(() => {
-      res.status(200).end();
+      return res.status(200).end();
     });
   });
 };

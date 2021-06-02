@@ -5,6 +5,8 @@ import './App.css';
 import { Route, BrowserRouter, Switch } from 'react-router-dom';
 import PostListPage from './Post/pages/PostListPage/PostListPage';
 import PostDetailPage from './Post/pages/PostDetailPage/PostDetailPage';
+import LogInPage from './Auth/pages/LogInPage/LogInPage';
+import RegisterPage from './Auth/pages/RegisterPage/RegisterPage';
 import { Provider } from 'react-redux';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -28,6 +30,8 @@ function App(props) {
                     <BrowserRouter>
                       <Switch>
                           <Route path="/" exact component={PostListPage} />
+                          <Route path="/login" exact component={LogInPage} />
+                          <Route path="/register" exact component={RegisterPage} />
                           <Route path="/posts/:cuid/:slug" exact component={PostDetailPage} />
                       </Switch>
                     </BrowserRouter>
