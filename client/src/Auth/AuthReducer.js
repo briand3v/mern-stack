@@ -1,4 +1,4 @@
-import { SIGN_UP, LOG_IN, SIGN_UP_FAILURE } from './AuthActions';
+import { SIGN_UP, LOG_IN, LOG_OUT, SAVE_TOKEN } from './AuthActions';
 
 const initialState = { data: {} }
 
@@ -12,11 +12,15 @@ const AuthReducer = (state = initialState, action) => {
             return {
                 data: action.user
             }
-        case SIGN_UP_FAILURE:
+        case LOG_OUT:
+            return {
+                data: {}
+            }
+        case SAVE_TOKEN:
             return {
                 data: {
-                    failure: true,
-                    message: action.user.message
+                    ...state.data,
+                    token: action.token
                 }
             }
         default:

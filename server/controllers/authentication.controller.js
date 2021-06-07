@@ -3,7 +3,13 @@ const { checkUserAlreadyExist } = require('../services/user');
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 
-const signUp = async (req, res, next) => {
+/**
+ * Delete a post
+ * @param req
+ * @param res
+ * @returns void
+ */
+signUp = async (req, res, next) => {
     const { username, password, confirmPassword } = req.body;
 
     if (password !== confirmPassword) {
@@ -26,9 +32,16 @@ const signUp = async (req, res, next) => {
     }
 }
 
-const login = (req, res, next) => {
+/**
+ * Delete a post
+ * @param req
+ * @param res
+ * @returns void
+ */
+login = (req, res, next) => {
     passport.authenticate('local', { session: false, failureMessage: 'Missing credentials' }, (error, user) => {
-        if (error || !user) return next(error);
+        if (error) return res.status(500).json({ message: 'Something bad happened'});
+        if (!user) return res.status(404).json({ message: 'User not found' });
         // token generate
         const payload = {
             sub: user._id,
@@ -41,7 +54,19 @@ const login = (req, res, next) => {
     })(req, res, next);
 }
 
+/**
+ * Delete a post
+ * @param req
+ * @param res
+ * @returns void
+ */
+logOut = (req, res) => {
+    req.logout();
+    return res.status(200).json({ message: 'user logout' });
+}
+
 module.exports = {
     signUp,
-    login
+    login,
+    logOut
 }

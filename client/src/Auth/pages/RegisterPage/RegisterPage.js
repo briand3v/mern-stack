@@ -1,76 +1,111 @@
-import React, { useState } from 'react';
-import Form from '../../components/Form';
-// import Alert from '@material-ui/lab/Alert';
-import { useDispatch, useSelector, connect } from 'react-redux';
+import React, { useEffect, useRef, useState } from 'react';
+import PropTypes from 'prop-types';
+//components
+import AuthCard from '../../components/AuthCard';
+import AlertMessage from '../../../Alert/components/AlertMessage';
+//actions
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { signUpRequest } from '../../AuthActions';
+import { showAlertAction } from '../../../Alert/AlertActions';
+import { makeStyles } from '@material-ui/core';
 
-const RegisterPage = ({ user }) => {
-    let history = useHistory();
-    const [usernameInput, setUsernameInput] = useState('');
-    const [passwordInput, setPasswordInput] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+const useStyles = makeStyles((theme) => ({
+    loginPage: {
+        color: theme.palette.text.primary
+    }
+}));
+
+const RegisterPage = () => {
+    const defaults = {
+        usernameInput: '',
+        passwordInput: '',
+        confirmPassword: ''
+    };
+    const history = useHistory();
+    const alert = useSelector(state => state.alert);
+    const classes = useStyles();
     const dispatch = useDispatch();
+    const timer = useRef(null);
+    const [state, setState] = useState(defaults);
+
+    useEffect(() => {
+        return (() => {
+            clearInterval(timer.current);
+        });
+    }, []);
 
     const onChange = ({ target }, input) => {
-        if (input === 'username') {
-            setUsernameInput(target.value);
-        } else if (input === 'password') {
-            setPasswordInput(target.value);
-        } else if (input === 'confirmPassword') {
-            setConfirmPassword(target.value);
-        }
-    }
+        const targetInputs = {
+            username: 'usernameInput',
+            password: 'passwordInput',
+            confirmPassword: 'confirmPassword'
+        };
+        
+        setState({
+            ...state,
+            [targetInputs[input]]: target.value
+        });
+    };
 
-    console.log(user);
+    const resetInputsValues = () => setState(defaults);
+    const validatePassword = (password) => {
+        return new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})").test(password);
+    }
 
     const onSubmit = () => {
-        if (usernameInput !== '' && passwordInput !== '' && confirmPassword !== '') {
-            const user = {
-                username: usernameInput,
-                password: passwordInput,
-                confirmPassword: confirmPassword
-            };
-            dispatch(signUpRequest(user)).then(res => {
-                console.log('Super here', res);
+        if (state.usernameInput !== '' && state.passwordInput !== '' && state.confirmPassword !== '') {
+            if (state.passwordInput !== state.confirmPassword) {
+                dispatch(showAlertAction({
+                    alertType: 'error',
+                    message: 'Password does not match'
+                }));
+                return;
+            }
+            if (!validatePassword()) {
+                dispatch(showAlertAction({
+                    alertType: 'error',
+                    message: 'Password must have 1 lowercase, 1 uppercase, 1 numeric, at least one special character, and at least 8 characters',
+                    timer: 2500
+                }));
+                return;
+            }
+            dispatch(signUpRequest({
+                username: state.usernameInput,
+                password: state.passwordInput,
+                confirmPassword: state.confirmPassword
+            })).then((res) => {
+                let alert = { alertType: res.type, message: res.message };
+                dispatch(showAlertAction(alert));
+                if (res.user) return timer.current = setTimeout(() => { history.push('/login') }, 1500);
+                resetInputsValues();
             });
+        } else {
+            // dispatch alert show 
+            dispatch(showAlertAction({
+                alertType: 'error',
+                message: 'Fields required'
+            }));
         }
-    }
-
-    const handleClick = () => {
-        history.push('/login')
     }
 
     return (
         <div className="container">
-            <div className="login-page">
-                <div className="title">
+            <div className={`${classes.loginPage} d-flex flex-column align-items-center justify-content-center`}>
+                <div className="title" style={{ marginBottom: 20 }}>
                     <h1>Create account</h1>
                 </div>
-                <Form
-                    username={usernameInput}
-                    password={passwordInput}
-                    onChange={onChange}
-                    onSubmit={onSubmit}
-                    page="register"
-                />
-                <div>
-                    <p>Have already an account ?</p>
-                    <a onClick={handleClick}>Log in</a>
-                </div>
-                {
-                    user.failure && (
-                        // <Alert severity="error">{ user.message }</Alert>
-                        <div>{user.message}</div>
-                    )
-                }
+                
+                <AuthCard inputs={state} onChange={onChange} onSubmit={onSubmit} page={'register'} />
+
+                <AlertMessage data={alert} />
             </div>
         </div>
     );
 }
 
-const mapStateToProps = (state) => ({
-    user: state.user.data
-});
+RegisterPage.propTypes = {
+    alert: PropTypes.object.isRequired
+};
 
-export default connect(mapStateToProps)(RegisterPage);
+export default RegisterPage;

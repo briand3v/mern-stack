@@ -29,6 +29,17 @@ app.use(passport.initialize());
 app.use('/api', posts);
 app.use('/api/auth', authentication);
 
+// error handler
+app.use((err, req, res, next) => {
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
+    // render the error page
+    res.status(err.status || 500);
+    res.render('error');
+});
+
+
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 app.listen(apiPort, () => console.log(`Server running on port ${apiPort}`));

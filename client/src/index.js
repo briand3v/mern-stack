@@ -4,6 +4,7 @@ import { combineReducers, createStore, compose, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import posts from './Post/PostReducer';
 import user from './Auth/AuthReducer';
+import alert from './Alert/AlertReducer';
 import './index.css';
 import App from './App';
 
@@ -14,6 +15,6 @@ const enhancers = [
     applyMiddleware(thunk),
 ];
 
-const initialStore = createStore(combineReducers({ posts, user }), {}, composeEnhancers(...enhancers));
+const initialStore = createStore(combineReducers({ posts, user, alert }), {}, composeEnhancers(...enhancers));
 
 ReactDOM.render(<App store={initialStore}/>, document.getElementById('root'));

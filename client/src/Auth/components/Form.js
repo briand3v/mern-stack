@@ -1,50 +1,59 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles(theme => ({
+    input: {
+        '& > *': {
+            color: theme.palette.text.secondary,
+            fontWeight: 700,
+            fontFamily: 'Montserrat'
+        },
+        '& > .Mui-focused': {
+            color: theme.palette.text.secondary
+        },
+        width: '100%'
+    }
+}));
 
 const Form = props => {
+    const classes = useStyles();
 
     return (
-
-        <form className="form-content" noValidate autoComplete="off">
+        <form className="form" noValidate autoComplete="off">
             <div>
                 <TextField 
+                    required
                     id="standard-helperText" 
+                    className={classes.input}
                     label="Username" 
-                    defaultValue="" 
+                    value={props.username}
                     onChange={(event) => { props.onChange(event, 'username'); }}
                 />
                 <TextField
+                    required
                     id="standard-password-input"
+                    className={classes.input}
                     label="Password"
                     type="password"
+                    value={props.password}
                     autoComplete="current-password"
                     onChange={(event) => { props.onChange(event, 'password'); }}
                 />
                 {
                     props.page === 'register' && (
                         <TextField
-                            id="standard-password-input"
+                            required
+                            id="standard-confirm-password-input"
+                            className={classes.input}
                             label="Confirm password"
                             type="password"
+                            value={props.confirmPassword}
                             autoComplete="current-password"
                             onChange={(event) => { props.onChange(event, 'confirmPassword'); }}
                         />
                     ) 
                 }
-            </div>
-
-            <div className="button-content">
-                <Button
-                    className="submit-form"
-                    variant='contained'
-                    color='secondary'
-                    onClick={props.onSubmit}
-                >
-                    {
-                        props.page === 'login' ? ('log in') : ('Register')
-                    }
-                </Button>
             </div>
         </form>
     );
